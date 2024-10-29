@@ -73,46 +73,18 @@ double* func_equality(double (*fcnA)(int, int, double), double (*fcnB)(int, int,
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Usage: %s <value1> <value2> ...\n", argv[0]);
-        return 1;
-    }
-
     int size = argc - 1;
-    double* values = malloc(size * sizeof(double));
+    double* values = malloc(sizeof(double));
     if (values == NULL) {
-        printf("Memory allocation failed\n");
         return 1;
     }
 
     for (int i = 0; i < size; i++) {
-        values[i] = atof(argv[i + 1]);
+        values[i] = atof(argc[i + 1]);
     }
-
-    // Example values for a and b
-    int a = 1, b = 1;
-
-    // Test linear, quadratic, exponential, and sine functions
-    for (int i = 0; i < size; i++) {
-        double x = values[i];
-        printf("Linear func (a=%d, b=%d, x=%.2f) = %.2f\n", a, b, x, linear_func(a, b, x));
-        printf("Quadratic func (a=%d, b=%d, x=%.2f) = %.2f\n", a, b, x, quadratic_func(a, b, x));
-        printf("Exp func (a=%d, b=%d, x=%.2f) = %.2f\n", a, b, x, exp_func(a, b, x));
-        printf("Sin func (a=%d, b=%d, x=%.2f) = %.2f\n", a, b, x, sin_func(a, b, x));
-    }
-
-    // Test function composition (e.g., composing linear_func and quadratic_func)
-    for (int i = 0; i < size; i++) {
-        double x = values[i];
-        double result = func_comp(linear_func, quadratic_func, a, b, x);
-        printf("Composition of linear and quadratic funcs (a=%d, b=%d, x=%.2f) = %.2f\n", a, b, x, result);
-    }
-
-    // Test function derivatives
-    double h = 0.001;  // Step size for numerical differentiation
-    for (int i = 0; i < size; i++) {
-        double x = values[i];
-        printf("First derivative of linear func (a=%d, b=%d, x=%.2f) = %.2f\n", a, b, x, func_derivative(linear_func, 1, h, a, b, x));
-        printf("Second derivative of quadratic func (a=%d, b=%d, x=%.
+    
+    free(values);
+    return 0;
+}
 
 
