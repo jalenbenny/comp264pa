@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (int i = 0; i < size; i++) {
-        values[i] = atof(argc[i + 1]);
+        values[i] = atof(argv[i + 1]);
     }
     
     free(values);
