@@ -41,40 +41,6 @@ double func_derivative(double (*fcn)(int, int, double), int order, double h, int
     return NAN;  // invalid order
 }
 
-// Compares two functions and their derivatives up to second order
-double* func_equality(double (*fcnA)(int, int, double), double (*fcnB)(int, int, double),
-                     double* x_values, int size, double tol) {
-    double* result = malloc(size * 3 * sizeof(double));
-    if (!result) return NULL;
-
-    const double h = 0.001;
-    const int a = 1, b = 1;
-
-    for (int i = 0; i < size; i++) {
-        double x = x_values[i];
-        
-        // Compare function values
-        double fa = fcnA(a, b, x);
-        double fb = fcnB(a, b, x);
-        result[i * 3] = fabs(fa - fb) < tol ? 1.0 : 0.0;
-        
-        // Compare first derivatives
-        double da = func_derivative(fcnA, 1, h, a, b, x);
-        double db = func_derivative(fcnB, 1, h, a, b, x);
-        result[i * 3 + 1] = fabs(da - db) < tol ? 1.0 : 0.0;
-        
-        // Compare second derivatives
-        double d2a = func_derivative(fcnA, 2, h, a, b, x);
-        double d2b = func_derivative(fcnB, 2, h, a, b, x);
-        result[i * 3 + 2] = fabs(d2a - d2b) < tol ? 1.0 : 0.0;
-        
-        if (fabs(fa - fb) >= tol) {
-            free(result);
-            return NULL;
-        }
-    }
-    return result;
-}
 
 // main method for obtaining values for function evaluation from command line arguments
 int main(int argc, char *argv[]) {
