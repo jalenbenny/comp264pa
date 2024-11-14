@@ -1,7 +1,7 @@
 // I, Ben Flowers, certify that this programming assignment reflects my own work,
 // without the use of any external individuals (other than course/department staff ), generative-AI,
 // or any other forbidden resources. I understand/accept the consequences of cheating as outlined
-// in the course syllabus.
+// in the course syllabus
 
 
 
