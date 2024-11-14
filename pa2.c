@@ -1,7 +1,15 @@
+// I, Ben Flowers, certify that this programming assignment reflects my own work,
+// without the use of any external individuals (other than course/department staff ), generative-AI,
+// or any other forbidden resources. I understand/accept the consequences of cheating as outlined
+// in the course syllabus.
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
+// functions with parameters a, b and input x
 double linear_func(int a, int b, double x) {
     return a * x + b;
 }
@@ -18,47 +26,44 @@ double sin_func(int a, int b, double x) {
     return a * sin(b * x);
 }
 
-double func_comp(double (*fcnA)(int, int, double), double (*fcnB)(int, int, double), int a, int b, double x) {
-    return fcnA(a, b, fcnB(a, b, x));
-}
-
-double func_derivative(double (*fcnA)(int, int, double), int order, double h, int a, int b, double x) {
-    switch (order) {
-        case 0:
-            return fcnA(a, b, x);
-        case 1:
-            return (fcnA(a, b, x + h) - fcnA(a, b, x)) / h;
-        case 2:
-            return (fcnA(a, b, x + h) - 2 * fcnA(a, b, x) + fcnA(a, b, x - h)) / (h * h);
-        default:
-            return 3.14159;
+// calculate nth order derivative with central difference method 
+double func_derivative(double (*fcn)(int, int, double), int order, double h, int a, int b, double x) {
+    if (order == 0) return fcn(a, b, x);
+    
+    if (order == 1) {
+        return (fcn(a, b, x + h) - fcn(a, b, x - h)) / (2 * h);  // central difference
     }
+    
+    if (order == 2) {
+        return (fcn(a, b, x + h) - 2 * fcn(a, b, x) + fcn(a, b, x - h)) / (h * h);
+    }
+    
+    return NAN;  // invalid order
 }
 
+// Compares two functions and their derivatives up to second order
 double* func_equality(double (*fcnA)(int, int, double), double (*fcnB)(int, int, double),
-                      double* values, int size, double tol) {
-    double* result = realloc(values, size * 3 * sizeof(double));
-    if (result == NULL) {
-        return NULL;
-    }
+                     double* x_values, int size, double tol) {
+    double* result = malloc(size * 3 * sizeof(double));
+    if (!result) return NULL;
 
     const double h = 0.001;
-    const int a = 1, b = 1; // Example values for a and b
+    const int a = 1, b = 1;
 
     for (int i = 0; i < size; i++) {
-        double x = values[i];
+        double x = x_values[i];
         
-        // Function values
+        // Compare function values
         double fa = fcnA(a, b, x);
         double fb = fcnB(a, b, x);
         result[i * 3] = fabs(fa - fb) < tol ? 1.0 : 0.0;
         
-        // First derivatives
+        // Compare first derivatives
         double da = func_derivative(fcnA, 1, h, a, b, x);
         double db = func_derivative(fcnB, 1, h, a, b, x);
         result[i * 3 + 1] = fabs(da - db) < tol ? 1.0 : 0.0;
         
-        // Second derivatives
+        // Compare second derivatives
         double d2a = func_derivative(fcnA, 2, h, a, b, x);
         double d2b = func_derivative(fcnB, 2, h, a, b, x);
         result[i * 3 + 2] = fabs(d2a - d2b) < tol ? 1.0 : 0.0;
@@ -68,23 +73,43 @@ double* func_equality(double (*fcnA)(int, int, double), double (*fcnB)(int, int,
             return NULL;
         }
     }
-
     return result;
 }
 
+// main method for obtaining values for function evaluation from command line arguments
 int main(int argc, char *argv[]) {
-    int size = argc - 1;
-    double* values = malloc(sizeof(double));
-    if (values == NULL) {
+    if (argc < 3) {
+        // requires at least two arguments: values and the last one as "h"
         return 1;
     }
 
-    for (int i = 0; i < size; i++) {
-        values[i] = atof(argv[i + 1]);
+    // get the size of the array for values (argc - 2) and the value of h
+    int size = argc - 2;
+    double h = atof(argv[argc - 1]);
+    
+    // allocate dynamic arrays for x, x+h, and x-h
+    double *x_values = malloc(size * sizeof(double));
+    double *x_plus_h = malloc(size * sizeof(double));
+    double *x_minus_h = malloc(size * sizeof(double));
+    
+    if (!x_values || !x_plus_h || !x_minus_h) {
+        free(x_values);
+        free(x_plus_h);
+        free(x_minus_h);
+        return 1;
     }
     
-    free(values);
+    // populate x_values and compute x+h and x-h arrays
+    for (int i = 0; i < size; i++) {
+        x_values[i] = atof(argv[i + 1]);
+        x_plus_h[i] = x_values[i] + h;
+        x_minus_h[i] = x_values[i] - h;
+    }
+    
+    // clean up dynamic memory
+    free(x_values);
+    free(x_plus_h);
+    free(x_minus_h);
+    
     return 0;
 }
-
-
