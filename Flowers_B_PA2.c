@@ -3,53 +3,87 @@
 // or any other forbidden resources. I understand/accept the consequences of cheating as outlined
 // in the course syllabus
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-// functions with parameters a, b and input x
-double linear_func(int a, int b, double x) {
-    return a * x + b;
-}
-
-double quadratic_func(int a, int b, double x) {
-    return x * x + a * x + b;
-}
-
-double exp_func(int a, int b, double x) {
-    return exp(a * x) + b;
-}
-
-double sin_func(int a, int b, double x) {
-    return a * sin(b * x);
-}
-
-// calculate nth order derivative with central difference method 
-double func_derivative(double (*fcn)(int, int, double), int order, double h, int a, int b, double x) {
-    if (order == 0) return fcn(a, b, x);
+// linear function: y = ax + b 
+double *linear_func(int a, int b, const double *values, int size) {
+    double *output = (double *)malloc(size * sizeof(double));
+    if (!output) return NULL;
     
-    if (order == 1) {
-        return (fcn(a, b, x + h) - fcn(a, b, x - h)) / (2 * h);  // central difference
+    for (int i = 0; i < size; i++) {
+        output[i] = a * values[i] + b;
     }
-    
-    if (order == 2) {
-        return (fcn(a, b, x + h) - 2 * fcn(a, b, x) + fcn(a, b, x - h)) / (h * h);
-    }
-    
-    return NAN;  // invalid order
+    return output;
 }
 
+// quadratic function: y = x^2 + ax + b 
+double *quadratic_func(int a, int b, const double *values, int size) {
+    double *output = (double *)malloc(size * sizeof(double));
+    if (!output) return NULL;
+    
+    for (int i = 0; i < size; i++) {
+        output[i] = values[i] * values[i] + a * values[i] + b;
+    }
+    return output;
+}
 
-// main method for obtaining values for function evaluation from command line arguments
+// exponential function: y = e^(ax) + b
+double *exp_func(int a, int b, const double *values, int size) {
+    double *output = (double *)malloc(size * sizeof(double));
+    if (!output) return NULL;
+    
+    for (int i = 0; i < size; i++) {
+        output[i] = exp(a * values[i]) + b;
+    }
+    return output;
+}
+
+// sine function: y = a * sin(bx) 
+double *sin_func(int a, int b, const double *values, int size) {
+    double *output = (double *)malloc(size * sizeof(double));
+    if (!output) return NULL;
+    
+    for (int i = 0; i < size; i++) {
+        output[i] = a * sin(b * values[i]);
+    }
+    return output;
+}
+
+// derivative function with switch case 
+double *func_derivative(const char *func, double *val_plus, double *val, double *val_minus,
+                        int a, int b, int order, double h, int size) {
+    double *output = (double *)malloc(size * sizeof(double));
+    if (!output) return NULL;
+
+    for (int i = 0; i < size; i++) {
+        switch (order) {
+            case 0:
+                output[i] = val[i];
+                break;
+            case 1:
+                output[i] = (val_plus[i] - val[i]) / h;
+                break;
+            case 2:
+                output[i] = (val_plus[i] - 2 * val[i] + val_minus[i]) / (h * h);
+                break;
+            default:
+                output[i] = 3.14159; // default case
+                break;
+        }
+    }
+    return output;
+}
+
+// ,ain method for obtaining values for function evaluation from command line arguments */
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         // requires at least two arguments: values and the last one as "h"
         return 1;
     }
 
-    // get the size of the array for values (argc - 2) and the value of h
+    // obtain the size of the array for values (argc - 2) and the value of h
     int size = argc - 2;
     double h = atof(argv[argc - 1]);
     
